@@ -142,14 +142,21 @@ async def running(
         # if you want to disable recsys, please comment this line
         await infra.update_rec_table()
 
-        # 0.05 * timestep here means 3 minutes / timestep
         simulation_time_hour = start_hour + 0.05 * timestep
         tasks = []
         for node_id, agent in agent_graph.get_agents():
             if agent.user_info.is_controllable is False:
                 agent_ac_prob = random.random()
-                threshold = agent.user_info.profile["other_info"][
-                    "active_threshold"][int(simulation_time_hour % 24)]
+
+                # === FIXED active_threshold block ===
+                hour_index = int(simulation_time_hour % 24)
+                threshold_list = agent.user_info.profile.get("other_info", {}).get("active_threshold")
+                if isinstance(threshold_list, list) and len(threshold_list) > hour_index:
+                    threshold = threshold_list[hour_index]
+                else:
+                    threshold = 0.5
+                    social_log.warning(f"Missing or malformed active_threshold for agent {node_id}. Using default 0.5")
+
                 if agent_ac_prob < threshold:
                     tasks.append(agent.perform_action_by_llm())
             else:

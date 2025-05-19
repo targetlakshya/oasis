@@ -215,7 +215,7 @@ def save_user_data(user_data, filename):
 
 
 if __name__ == "__main__":
-    N = 10000  # Target user number
+    N = 100  # Target user number
     user_data = generate_user_data(N)
     output_path = 'experiment_dataset/user_data/user_data_10000.json'
     save_user_data(user_data, output_path)
