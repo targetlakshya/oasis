@@ -1,14 +1,19 @@
-task: "Simulate social media discussion on news topics"
-users:
-  - name: "user_0"
-    role: "Commenter"
-    persona: "Tech enthusiast"
-    initial_message: "Just saw the latest article about AI trends!"
-  - name: "user_1"
-    role: "Analyst"
-    persona: "Loves digging into politics"
-    initial_message: "Another political shake-up! Thoughts?"
-environment:
-  rss_feed_path: "examples/experiment/twitter_rss/live_rss_feed.json"
-  user_data_path: "examples/experiment/twitter_rss/user_data.csv"
-  simulation_steps: 10
+data:
+  csv_path: "examples/experiment/twitter_rss/live_rss_feed.csv"    # Path to your RSS feed CSV file with posts or agent info
+  db_path: ":memory:"                   # Use in-memory DB for simplicity, or file path for persistent DB
+
+simulation:
+  recsys_type: "twhin-bert"                 # Use "simple" for your custom recommendation logic
+  num_timesteps: 10                    # Number of simulation steps (e.g., 10)
+  clock_factor: 60                     # Clock speed multiplier (real-time seconds per simulation step)
+  available_actions : [
+    ActionType.CREATE_POST,
+    ActionType.LIKE_POST,
+    ActionType.REPOST,
+    ActionType.FOLLOW,
+    ActionType.DO_NOTHING,
+    ]
+
+inference:
+  model_type: "gpt-4o-mini"         # The GPT model your agents will use
+  is_openai_model: true             # Set to true if using OpenAI's GPT models

@@ -65,10 +65,10 @@ parser.add_argument(
 
 DATA_DIR = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
-    "data/twitter_dataset/anonymous_topic_200_1h",
+    "examples/experiment/twitter_rss",
 )
 DEFAULT_DB_PATH = ":memory:"
-DEFAULT_CSV_PATH = os.path.join(DATA_DIR, "False_Business_0.csv")
+DEFAULT_CSV_PATH = os.path.join(DATA_DIR, "user_data.csv")
 
 
 async def running(
@@ -110,7 +110,7 @@ async def running(
         )
 
     try:
-        all_topic_df = pd.read_csv("data/twitter_dataset/all_topics.csv")
+        all_topic_df = pd.read_csv("examples/experiment/twitter_rss/live_rss_feed.csv")
         if "False" in csv_path or "True" in csv_path:
             if "-" not in csv_path:
                 topic_name = csv_path.split("/")[-1].split(".")[0]
@@ -118,7 +118,7 @@ async def running(
                 topic_name = csv_path.split("/")[-1].split(".")[0].split(
                     "-")[0]
             source_post_time = (
-                all_topic_df[all_topic_df["topic_name"] ==
+                all_topic_df[all_topic_df["title"] ==
                              topic_name]["start_time"].item().split(" ")[1])
             start_hour = int(source_post_time.split(":")[0]) + float(
                 int(source_post_time.split(":")[1]) / 60)
