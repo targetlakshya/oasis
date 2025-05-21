@@ -20,7 +20,7 @@ Change the number of users you want to generate and the path where the user data
 
 ```bash
 if __name__ == "__main__":
-    N = 10000  # Target user number
+    N = 1000  # Target user number
     user_data = generate_user_data(N)
     output_path = 'user_data_10000.json'
     save_user_data(user_data, output_path)

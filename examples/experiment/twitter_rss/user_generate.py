@@ -41,7 +41,7 @@ for i, title in enumerate(all_sanitized_titles, start=1):
         "following_agentid_list": str(following_ids),
         "previous_tweets": str(previous_tweets),
         "user_char": random.choice(user_chars),
-        "description": title[:100]  # Limit to 100 characters
+        "description": title[:100]  
     }
     users.append(user)
 

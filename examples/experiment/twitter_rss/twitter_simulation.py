@@ -2,7 +2,6 @@ import asyncio
 import os
 import pandas as pd
 import random
-import json
 from datetime import datetime
 from pathlib import Path
 from oasis.clock.clock import Clock
@@ -10,19 +9,18 @@ from oasis.social_platform.channel import Channel
 from oasis.social_platform.platform import Platform
 from oasis.social_agent.agents_generator import generate_agents
 from oasis.social_platform.typing import ActionType
-
 import logging
 
-# Logging setup
+# Logging setup for console output
 social_log = logging.getLogger("social")
 social_log.setLevel(logging.INFO)
 social_log.addHandler(logging.StreamHandler())
 
 # Paths
 RSS_FEED_PATH = "examples/experiment/twitter_rss/live_rss_feed.csv"
-USER_PROFILE_PATH = "examples/experiment/twitter_rss/user_data.csv"
+USER_PROFILE_PATH = "examples/experiment/twitter_rss/user_data1.csv"
 DEFAULT_DB_PATH = ":memory:"
-OUTPUT_JSON = "examples/experiment/twitter_rss/twitter_simulation_output.json"
+OUTPUT_LOG = "examples/experiment/twitter_rss/twitter_simulation_output.log"
 
 async def simulate_twitter(
     db_path=DEFAULT_DB_PATH,
@@ -31,12 +29,15 @@ async def simulate_twitter(
     num_timesteps=5,
     clock_factor=60,
 ):
-    # Clean DB if file-based (ignored if in-memory)
+  
     if db_path != ":memory:" and os.path.exists(db_path):
         os.remove(db_path)
     Path(os.path.dirname(db_path) or ".").mkdir(parents=True, exist_ok=True)
 
-    # Start time
+  
+    Path(os.path.dirname(OUTPUT_LOG)).mkdir(parents=True, exist_ok=True)
+
+    # Start time extraction from RSS feed
     try:
         rss_df = pd.read_csv(rss_path).fillna("")
         title = rss_df.iloc[0]["title"]
@@ -67,10 +68,10 @@ async def simulate_twitter(
         agent_info_path=user_path,
         twitter_channel=twitter_channel,
         start_time=start_time,
-        model=None,
+        model=0,
         recsys_type="twhin-bert",
         twitter=infra,
-    )
+    )   
 
     collected_responses = []
 
@@ -93,18 +94,19 @@ async def simulate_twitter(
 
         results = await asyncio.gather(*tasks)
         for r in results:
-            if r:  # Only collect non-empty responses
+            if r:
                 collected_responses.append(r)
 
-    Path(os.path.dirname(OUTPUT_JSON)).mkdir(parents=True, exist_ok=True)
-    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-        json.dump(collected_responses, f, indent=2, ensure_ascii=False)
+    with open(OUTPUT_LOG, "w", encoding="utf-8") as log_file:
+        for response in collected_responses:
+            log_file.write(str(response) + "\n")
+            log_file.write("\n\n")  
 
-    social_log.info(f"✅ Saved {len(collected_responses)} unique responses to {OUTPUT_JSON}")
-
+    social_log.info(f"✅ Saved {len(collected_responses)} responses to {OUTPUT_LOG}")
 
     await twitter_channel.write_to_receive_queue((None, None, ActionType.EXIT))
     await twitter_task
+
 
 if __name__ == "__main__":
     asyncio.run(simulate_twitter())

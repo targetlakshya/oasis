@@ -15,5 +15,5 @@ simulation:
     ]
 
 inference:
-  model_type: "gpt-4o-mini"         # The GPT model your agents will use
+  model_type: "gpt-4o-mini"         
   is_openai_model: true             # Set to true if using OpenAI's GPT models
